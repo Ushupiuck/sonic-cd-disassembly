@@ -336,7 +336,7 @@ Level_MainLoop:
 	bsr.w	VSync
 
 	if REGION=USA				; Did the player die?
-		cmpi.b	#6,objPlayerSlot+oRoutine.w	
+		cmpi.b	#6,objPlayerSlot+oRoutine.w
 		bcc.s	.CheckPaused		; If so, branch
 	endif
 	tst.b	ctrlLocked.w			; Are controls locked?
@@ -350,7 +350,7 @@ Level_MainLoop:
 	beq.w	.NotPaused			; If not, branch
 
 	bsr.w	PauseMusic			; Pause music
-	
+
 	if DEMO<>0
 		tst.w	demoMode		; Are we in a demo?
 		bne.s	.IsDemo			; If so, branch
@@ -382,7 +382,7 @@ Level_MainLoop:
 .CheckReset:
 	andi.b	#$70,d0				; Was A, B, or C pressed?
 	beq.w	Level_MainLoop			; If not, branch
-	
+
 .IsDemo:
 	clr.b	lives				; Set lives to 0
 
@@ -682,11 +682,10 @@ UnpauseMusic:
 VInterrupt:
 	bset	#0,GAIRQ2			; Send Sub CPU IRQ2 request
 	movem.l	d0-a6,-(sp)			; Save registers
-
 	tst.b	vintRoutine.w			; Are we lagging?
 	beq.s	VInt_Lag			; If so, branch
 
-	move.w	VDPCTRL,d0	
+	move.w	VDPCTRL,d0
 	move.l	#$40000010,VDPCTRL		; Update VScroll
 	move.l	vscrollScreen.w,VDPDATA
 
@@ -711,7 +710,6 @@ VInt_Finish:
 
 VInt_Done:
 	addq.l	#1,levelVIntCounter		; Increment frame counter
-
 	movem.l	(sp)+,d0-a6			; Restore registers
 	rte
 
@@ -973,7 +971,7 @@ RunTimeWarp:
 	tst.b	objPlayerSlot+oPlayerCharge.w	; Is the player charging?
 	bne.s	.End				; If so, branch
 	tst.w	timeWarpTimer.w			; Is the time warp timer active?
-	beq.s	.End				; If not, branch	
+	beq.s	.End				; If not, branch
 	addq.w	#1,timeWarpTimer.w		; Increment time warp timer
 
 .End:

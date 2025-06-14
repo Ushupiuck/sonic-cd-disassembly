@@ -31,40 +31,40 @@ oVar\$c		EQU	c
 	endr
 
 	rsreset
-oID		rs.b	1			; ID
-oSprFlags	rs.b	1			; Sprite flags
-oTile		rs.w	1			; Base tile ID
-oMap		rs.l	1			; Sprite mappings pointer
-oX		rs.w	1			; X position
-oYScr		rs.b	0			; Y position (screen mode)
-oXSub		rs.w	1			; X position subpixel
-oY		rs.w	1			; Y position
-oYSub		rs.w	1			; Y position subpixel
-oXVel		rs.w	1			; X velocity
-oYVel		rs.w	1			; Y velocity
-		rs.b	2
-oYRadius	rs.b	1			; Y radius
-oXRadius	rs.b	1			; X radius
-oPriority	rs.b	1			; Sprite draw priority level
-oWidth		rs.b	1			; Width
-oMapFrame	rs.b	1			; Sprite mapping frame ID
-oAnimFrame	rs.b	1			; Animation script frame ID
-oAnim		rs.b	1			; Animation ID
-oPrevAnim	rs.b	1			; Previous previous animation ID
-oAnimTime	rs.b	1			; Animation timer
+oID		rs.b	1	; ID				0
+oSprFlags	rs.b	1	; Sprite flags			1
+oTile		rs.w	1	; Base tile ID			2
+oMap		rs.l	1	; Sprite mappings pointer	4
+oX		rs.w	1	; X position			8
+oYScr		rs.b	0	; Y position (screen mode)
+oXSub		rs.w	1	; X position subpixel		$A
+oY		rs.w	1	; Y position			$C
+oYSub		rs.w	1	; Y position subpixel		$E
+oXVel		rs.w	1	; X velocity			$10
+oYVel		rs.w	1	; Y velocity			$12
+		rs.b	2	;				$14 Unused
+oYRadius	rs.b	1	; Y radius			$15
+oXRadius	rs.b	1	; X radius			$16
+oPriority	rs.b	1	; Sprite draw priority level	$17
+oWidth		rs.b	1	; Width				$18
+oMapFrame	rs.b	1	; Sprite mapping frame ID	$19
+oAnimFrame	rs.b	1	; Animation script frame ID	$1A
+oAnim		rs.b	1	; Animation ID			$1B
+oPrevAnim	rs.b	1	; Previous previous animation ID$1C
+oAnimTime	rs.b	1	; Animation timer		$1D
 		rs.b	1
-oColType	rs.b	1			; Collision type
-oColStatus	rs.b	1			; Collision status
-oFlags		rs.b	1			; Flags
-oSavedFlagsID	rs.b	1			; Saved flags entry ID
-oRoutine	rs.b	1			; Routine ID
-oSolidType	rs.b	0			; Solidity type
-oRoutine2	rs.b	1			; Secondary routine ID
-oAngle		rs.b	1			; Angle
-		rs.b	1			; Object specific variable
-oSubtype	rs.b	1			; Subtype ID
-oLayer		rs.b	0			; Layer ID
-oSubtype2	rs.b	1			; Secondary subtype ID
+oColType	rs.b	1	; Collision type
+oColStatus	rs.b	1	; Collision status
+oFlags		rs.b	1	; Flags
+oSavedFlagsID	rs.b	1	; Saved flags entry ID
+oRoutine	rs.b	1	; Routine ID
+oSolidType	rs.b	0	; Solidity type
+oRoutine2	rs.b	1	; Secondary routine ID
+oAngle		rs.b	1	; Angle
+		rs.b	1	; Object specific variable
+oSubtype	rs.b	1	; Subtype ID
+oLayer		rs.b	0	; Layer ID
+oSubtype2	rs.b	1	; Secondary subtype ID
 
 ; -------------------------------------------------------------------------
 ; Player object variables

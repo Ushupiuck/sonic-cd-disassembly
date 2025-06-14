@@ -15,17 +15,16 @@
 Player_GroundCol:
 	btst	#3,oFlags(a0)			; Are we standing on an object?
 	beq.s	.OnGround			; If not, then we are on the ground
-
 	moveq	#0,d0				; Reset angle buffers
 	move.b	d0,primaryAngle.w
 	move.b	d0,secondaryAngle.w
 	rts
 
+
 .OnGround:
 	moveq	#3,d0				; Reset angle buffers
 	move.b	d0,primaryAngle.w
 	move.b	d0,secondaryAngle.w
-
 	move.b	oAngle(a0),d0			; Get the quadrant that we are in
 	addi.b	#$20,d0
 	bpl.s	.HighAngle
@@ -37,6 +36,7 @@ Player_GroundCol:
 	addi.b	#$20,d0
 	bra.s	.GotAngle
 
+
 .HighAngle:
 	move.b	oAngle(a0),d0
 	bpl.s	.SkipAdd
@@ -47,7 +47,6 @@ Player_GroundCol:
 
 .GotAngle:
 	andi.b	#$C0,d0
-
 	cmpi.b	#$40,d0				; Are we on a left wall?
 	beq.w	Player_WalkVertL		; If so, branch
 	cmpi.b	#$80,d0				; Are we on a ceiling?
@@ -78,7 +77,6 @@ Player_WalkFloor:
 	moveq	#$D,d5
 	bsr.w	FindLevelFloor
 	move.w	d1,-(sp)
-
 	move.w	oY(a0),d2			; Get secondary sensor position
 	move.w	oX(a0),d3
 	moveq	#0,d0
@@ -89,14 +87,12 @@ Player_WalkFloor:
 	ext.w	d0
 	neg.w	d0
 	add.w	d0,d3
-
 	lea	secondaryAngle.w,a4		; Get floor information from this sensor
 	movea.w	#$10,a3
 	move.w	#0,d6
 	moveq	#$D,d5
 	bsr.w	FindLevelFloor
 	move.w	(sp)+,d0
-
 	bsr.w	Player_PickSensor		; Choose which height and angle to go with
 	tst.w	d1				; Are we perfectly aligned to the ground?
 	beq.s	.End				; If so, branch
@@ -116,10 +112,10 @@ Player_WalkFloor:
 	add.w	d1,oY(a0)			; Align ourselves onto the floor
 	rts
 
+
 .CheckStick:
 	tst.b	oPlayerStick(a0)		; Are we sticking to a surface?
 	bne.s	.SetY				; If so, align to the floor anyways
-
 	bset	#1,oFlags(a0)			; Fall off the ground
 	bclr	#5,oFlags(a0)
 	move.b	#1,oPrevAnim(a0)
@@ -222,6 +218,7 @@ Player_PickSensor:
 	move.b	d2,oAngle(a0)			; Update angle
 	rts
 
+
 .FlatSurface:
 	move.b	oAngle(a0),d2			; Shift ourselves to the next quadrant
 	addi.b	#$20,d2
@@ -253,7 +250,6 @@ Player_WalkVertR:
 	moveq	#$D,d5
 	bsr.w	FindLevelWall
 	move.w	d1,-(sp)
-
 	move.w	oY(a0),d2			; Get secondary sensor position
 	move.w	oX(a0),d3
 	moveq	#0,d0
@@ -269,7 +265,6 @@ Player_WalkVertR:
 	moveq	#$D,d5
 	bsr.w	FindLevelWall
 	move.w	(sp)+,d0
-
 	bsr.w	Player_PickSensor		; Choose which height and angle to go with
 	tst.w	d1				; Are we perfectly aligned to the ground?
 	beq.s	.End				; If so, branch
@@ -292,7 +287,6 @@ Player_WalkVertR:
 .CheckStick:
 	tst.b	oPlayerStick(a0)		; Are we sticking to a surface?
 	bne.s	.SetX				; If so, align to the wall anyways
-
 	bset	#1,oFlags(a0)			; Fall off the ground
 	bclr	#5,oFlags(a0)
 	move.b	#1,oPrevAnim(a0)
@@ -322,7 +316,6 @@ Player_WalkCeiling:
 	moveq	#$D,d5
 	bsr.w	FindLevelFloor
 	move.w	d1,-(sp)
-
 	move.w	oY(a0),d2			; Get secondary sensor position
 	move.w	oX(a0),d3
 	moveq	#0,d0
@@ -339,7 +332,6 @@ Player_WalkCeiling:
 	moveq	#$D,d5
 	bsr.w	FindLevelFloor
 	move.w	(sp)+,d0
-
 	bsr.w	Player_PickSensor		; Choose which height and angle to go with
 	tst.w	d1				; Are we perfectly aligned to the ground?
 	beq.s	.End				; If so, branch
@@ -362,7 +354,6 @@ Player_WalkCeiling:
 .CheckStick:
 	tst.b	oPlayerStick(a0)		; Are we sticking to a surface?
 	bne.s	.SetY				; If so, align to the ceiling anyways
-
 	bset	#1,oFlags(a0)			; Fall off the ground
 	bclr	#5,oFlags(a0)
 	move.b	#1,oPrevAnim(a0)
@@ -392,7 +383,6 @@ Player_WalkVertL:
 	moveq	#$D,d5
 	bsr.w	FindLevelWall
 	move.w	d1,-(sp)
-
 	move.w	oY(a0),d2			; Get secondary sensor position
 	move.w	oX(a0),d3
 	moveq	#0,d0
@@ -409,7 +399,6 @@ Player_WalkVertL:
 	moveq	#$D,d5
 	bsr.w	FindLevelWall
 	move.w	(sp)+,d0
-
 	bsr.w	Player_PickSensor		; Choose which height and angle to go with
 	tst.w	d1				; Are we perfectly aligned to the ground?
 	beq.s	.End				; If so, branch
@@ -691,10 +680,8 @@ FindLevelFloor:
 	move.b	(a2,d0.w),d0
 	andi.w	#$FF,d0
 	beq.s	.IsBlank			; If it's blank, branch
-
 	lea	ColAngleMap,a2			; Get collision angle
 	move.b	(a2,d0.w),(a4)
-
 	lsl.w	#4,d0				; Get base collision block height map index
 	move.w	d3,d1				; Get X position
 	btst	#$B,d4				; Is this block horizontally flipped?
@@ -715,7 +702,6 @@ FindLevelFloor:
 	lea	ColHeightMap,a2
 	move.b	(a2,d1.w),d0
 	ext.w	d0
-
 	eor.w	d6,d4				; Is this block vertically flipped?
 	btst	#$C,d4
 	beq.s	.NoYFlip2			; If not, branch
@@ -782,10 +768,8 @@ FindLevelFloor2:
 	move.b	(a2,d0.w),d0
 	andi.w	#$FF,d0
 	beq.s	.IsBlank			; If it's blank, branch
-
 	lea	ColAngleMap,a2			; Get collision angle
 	move.b	(a2,d0.w),(a4)
-
 	lsl.w	#4,d0				; Get base collision block height map index
 	move.w	d3,d1				; Get X position
 	btst	#$B,d4				; Is this block horizontally flipped?
@@ -806,7 +790,6 @@ FindLevelFloor2:
 	lea	ColHeightMap,a2
 	move.b	(a2,d1.w),d0
 	ext.w	d0
-
 	eor.w	d6,d4				; Is this block vertically flipped?
 	btst	#$C,d4
 	beq.s	.NoYFlip2			; If not, branch
@@ -880,10 +863,8 @@ FindLevelWall:
 	move.b	(a2,d0.w),d0
 	andi.w	#$FF,d0
 	beq.s	.IsBlank			; If it's blank, branch
-
 	lea	ColAngleMap,a2			; Get collision angle
 	move.b	(a2,d0.w),(a4)
-
 	lsl.w	#4,d0				; Get base collision block width map index
 	move.w	d2,d1				; Get Y position
 	btst	#$C,d4				; Is this block vertically flipped?
@@ -904,7 +885,6 @@ FindLevelWall:
 	lea	ColWidthMap,a2
 	move.b	(a2,d1.w),d0
 	ext.w	d0
-
 	eor.w	d6,d4				; Is this block horizontally flipped?
 	btst	#$B,d4
 	beq.s	.NoYFlip2			; If not, branch

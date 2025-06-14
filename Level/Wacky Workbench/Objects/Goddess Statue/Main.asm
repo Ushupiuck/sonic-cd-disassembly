@@ -4,10 +4,8 @@
 ; -------------------------------------------------------------------------
 ; Goddess statue object
 ; -------------------------------------------------------------------------
-
 oGoddessTime	EQU	oVar2A
 oGoddessCount	EQU	oVar2B
-
 ; -------------------------------------------------------------------------
 
 ObjGoddessStatue:
@@ -16,22 +14,18 @@ ObjGoddessStatue:
 	move.w	.Index(pc,d0.w),d0
 	jsr	.Index(pc,d0.w)
 	jmp	CheckObjDespawn
-	
 ; -------------------------------------------------------------------------
-
 .Index:
 	dc.w	ObjGoddessStatue_Init-.Index
 	dc.w	ObjGoddessStatue_Main-.Index
 	dc.w	ObjGoddessStatue_SpitRings-.Index
 	dc.w	ObjGoddessStatue_Done-.Index
-
 ; -------------------------------------------------------------------------
 
 ObjGoddessStatue_Init:
 	addq.b	#2,oRoutine(a0)
 	ori.b	#4,oSprFlags(a0)
 	move.b	#50,oGoddessCount(a0)
-
 ; -------------------------------------------------------------------------
 
 ObjGoddessStatue_Main:
@@ -41,39 +35,37 @@ ObjGoddessStatue_Main:
 	bcs.s	.End
 	cmpi.w	#32,d0
 	bcc.s	.End
-	
+
 	move.w	objPlayerSlot+oY.w,d0
 	sub.w	oY(a0),d0
 	addi.w	#32,d0
 	bcs.s	.End
 	cmpi.w	#64,d0
 	bcc.s	.End
-	
+
 	addq.b	#2,oRoutine(a0)
-	
+
 .End:
 	rts
-
 ; -------------------------------------------------------------------------
 
 ObjGoddessStatue_SpitRings:
 	subq.b	#1,oGoddessTime(a0)
 	bpl.s	ObjGoddessStatue_Done
 	move.b	#10,oGoddessTime(a0)
-	
+
 	subq.b	#1,oGoddessCount(a0)
 	bpl.s	ObjGoddessStatue_SpawnRing
 	addq.b	#2,oRoutine(a0)
 
 ObjGoddessStatue_Done:
 	rts
-
 ; -------------------------------------------------------------------------
 
 ObjGoddessStatue_SpawnRing:
 	jsr	FindObjSlot
 	bne.s	.End
-	
+
 	move.b	#$11,oID(a1)
 	addq.b	#2,oRoutine(a1)
 	move.b	#8,oYRadius(a1)
@@ -90,18 +82,16 @@ ObjGoddessStatue_SpawnRing:
 	move.b	#8,oWidth(a1)
 	move.b	#8,oYRadius(a1)
 	move.b	#$FF,ringLossAnimTimer
-	
+
 	move.w	#-$200,oYVel(a1)
-	jsr	Random
+	jsr	(Random).l
 	lsl.w	#1,d0
 	andi.w	#$E,d0
 	move.w	.XVels(pc,d0.w),oXVel(a1)
-	
+
 .End:
 	rts
-
 ; -------------------------------------------------------------------------
-
 .XVels:
 	dc.w	-$100
 	dc.w	-$80
@@ -111,5 +101,4 @@ ObjGoddessStatue_SpawnRing:
 	dc.w	$180
 	dc.w	$200
 	dc.w	$280
-
 ; -------------------------------------------------------------------------

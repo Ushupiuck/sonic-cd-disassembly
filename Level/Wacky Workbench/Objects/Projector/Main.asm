@@ -28,7 +28,8 @@ ObjProjector:
 ; End of function ObjProjector
 
 ; -------------------------------------------------------------------------
-ObjProjector_Index:dc.w	ObjProjector_Init-ObjProjector_Index
+ObjProjector_Index:
+	dc.w	ObjProjector_Init-ObjProjector_Index
 	dc.w	ObjProjector_Main-ObjProjector_Index
 	dc.w	ObjProjector_StartExploding-ObjProjector_Index
 	dc.w	ObjProjector_Exploding-ObjProjector_Index

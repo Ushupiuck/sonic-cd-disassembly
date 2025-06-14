@@ -106,7 +106,7 @@ ctrlTap:
 
 VDPRegs:
 	dc.b	%00000100			; No H-INT
-	dc.b	%00110100			; V-INT, DMA, mode 5
+	dc.b	$34				; V-INT, DMA, mode 5
 	dc.b	$C000/$400			; Plane A location
 	dc.b	0				; Window location
 	dc.b	$C000/$2000			; Plane B location

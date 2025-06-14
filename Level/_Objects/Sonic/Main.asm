@@ -11,10 +11,8 @@
 
 ObjSonic_ChkBoredom:
 	lea	boredTimer.w,a1			; Get boredom timer
-
 	cmpi.b	#5,oAnim(a0)			; Is the player idle?
 	beq.s	.WaitAnim			; If so, branch
-
 	move.w	#0,(a1)				; Reset the boredom timer
 	rts
 
@@ -26,15 +24,11 @@ ObjSonic_ChkBoredom:
 .TimerGoing:
 	cmpi.w	#3*60*60,(a1)			; Have 3 minutes passed?
 	bcs.s	.End				; If not, branch
-
 	move.w	#0,(a1)				; Stop the timer
-
 	move.b	#$2B,oAnim(a0)			; Set the player's animation accordingly
 	ori.b	#$80,oTile(a0)
 	move.b	#0,oPriority(a0)
-
 	move.b	#1,lives			; Make it so a game over happens
-
 	move.w	#-$500,oYVel(a0)		; Make the player jump
 	move.w	#$100,oXVel(a0)
 	btst	#0,oFlags(a0)
@@ -43,7 +37,6 @@ ObjSonic_ChkBoredom:
 
 .GotXVel:
 	move.w	#0,oPlayerGVel(a0)
-
 	move.w	#SCMD_GIVEUPSFX,d0		; Play "I'm outta here" sound
 	bra.w	SubCPUCmd
 
@@ -64,7 +57,7 @@ ObjSonic:
 			btst	#7,p2CtrlTap.w	; Did player 2 press the start button?
 			beq.s	.CheckDebug	; If not, branch
 			eori.b	#1,debugCheat	; Swap debug cheat flag
-			
+
 .CheckDebug:
 		endif
 		tst.b	debugMode		; Are we in debug mode?
@@ -113,9 +106,7 @@ ObjSonic:
 ObjSonic_MakeTimeWarpStars:
 	tst.b	objTimeStar1Slot.w		; Are they already loaded?
 	bne.s	.End				; If so, branch
-
 	move.b	#1,timeWarp			; Set time warp flag
-
 	move.b	#3,objTimeStar1Slot.w		; Load time warp stars
 	move.b	#5,objTimeStar1Slot+oAnim.w
 	move.b	#3,objTimeStar2Slot.w
@@ -135,7 +126,6 @@ ObjSonic_MakeTimeWarpStars:
 
 ObjSonic_Init:
 	addq.b	#2,oRoutine(a0)			; Advance routine
-
 	move.b	#$13,oYRadius(a0)		; Default hitbox size
 	move.b	#9,oXRadius(a0)
 	tst.b	miniSonic			; Are we miniature?
@@ -162,11 +152,9 @@ ObjSonic_Init:
 ObjSonic_MakeWaterfallSplash:
 	tst.b	zone				; Are we in Palmtree Panic zone?
 	bne.s	.End				; If not, branch
-
 	move.b	levelFrames+1,d0		; Are we on an odd numbered frame?
 	andi.b	#1,d0
 	bne.s	.End				; If so, branch
-
 	move.b	oYRadius(a0),d2			; Are we behind a waterfall?
 	ext.w	d2
 	add.w	oY(a0),d2
@@ -174,7 +162,6 @@ ObjSonic_MakeWaterfallSplash:
 	bsr.w	ObjSonic_GetChunkAtPos
 	cmpi.b	#$2F,d1
 	bne.s	.End2				; If not, branch
-
 	cmpi.w	#$15C0,oX(a0)			; Are we too far into the level?
 	bcc.s	.End				; If so, branch
 	tst.b	oPlayerCtrl(a0)			; Are we in a spin tunnel?
@@ -231,7 +218,6 @@ ObjSonic_GetChunkAtPos:
 
 ObjSonic_ExtCamera:
 	move.w	camXCenter.w,d1			; Get camera X center position
-
 	move.w	oPlayerGVel(a0),d0		; Get how fast we are moving
 	bpl.s	.PosInertia
 	neg.w	d0
@@ -245,7 +231,6 @@ ObjSonic_ExtCamera:
 .No3DRamp:
 	cmpi.w	#$600,d0			; Are we going at max regular speed?
 	bcs.s	.ResetPan			; If not, branch
-
 	tst.w	oPlayerGVel(a0)			; Are we moving right?
 	bpl.s	.MovingRight			; If so, branch
 
@@ -286,7 +271,6 @@ ObjSonic_ExtCamera:
 ObjSonic_Main:
 	bsr.s	ObjSonic_ExtCamera		; Handle extended camera
 	bsr.w	ObjSonic_MakeWaterfallSplash	; Handle waterfall splash creation
-
 	tst.w	debugCheat			; Is debug mode enabled?
 	beq.s	.NoDebug			; If not, branch
 	btst	#4,p1CtrlTap.w			; Was the B button pressed?
@@ -304,7 +288,6 @@ ObjSonic_Main:
 	beq.s	.NormalCtrl			; If not, branch
 	cmpi.b	#6,zone				; Are we in Metallic Madness?
 	bne.s	.NotMMZ				; If not, branch
-
 	clr.w	timeWarpTimer.w			; Disable time warping
 	clr.b	timeWarp
 	bra.s	.SkipControl
@@ -319,18 +302,14 @@ ObjSonic_Main:
 	andi.w	#6,d0
 	move.w	ObjSonic_ModeIndex(pc,d0.w),d1
 	jsr	ObjSonic_ModeIndex(pc,d1.w)
-	
 	jsr	ObjSonic_SpecialCol		; Special level collision
 
 .SkipControl:
 	bsr.s	ObjSonic_Display		; Draw sprite and handle timers
 	bsr.w	ObjSonic_RecordPos		; Save current position into the position buffer
 	bsr.w	ObjSonic_Water			; Handle water
-
-						; Update our angle buffers
-	move.b	primaryAngle.w,oPlayerPriAngle(a0)
+	move.b	primaryAngle.w,oPlayerPriAngle(a0)	; Update our angle buffers
 	move.b	secondaryAngle.w,oPlayerSecAngle(a0)
-
 	tst.b	windTunnelFlag.w		; Are we in a wind tunnel?
 	beq.s	.NoWindTunnel			; If not, branch
 	tst.b	oAnim(a0)			; Are we in the walking animation?
@@ -339,12 +318,10 @@ ObjSonic_Main:
 
 .NoWindTunnel:
 	bsr.w	ObjSonic_Animate		; Animate sprite
-
 	tst.b	oPlayerCtrl(a0)			; Has object collision been disabled?
 	bmi.s	.NoObjCol			; If so, branch
 	cmpi.b	#$2B,oAnim(a0)			; Are we giving up from boredom?
 	beq.s	.NoObjCol			; If so, branch
-
 	jsr	Player_ObjCollide		; Handle object collision
 
 .NoObjCol:
@@ -1978,12 +1955,10 @@ ObjSonic_CheckFallOff:
 	bne.s	.End				; If so, branch
 	tst.w	oPlayerMoveLock(a0)		; Is our movement currently temporarily locked?
 	bne.s	.RunMoveLock			; If so, branch
-
 	move.b	oAngle(a0),d0			; Are we on a steep enough slope or ceiling?
 	addi.b	#$20,d0
 	andi.b	#$C0,d0
 	beq.s	.End				; If not, branch
-
 	move.w	oPlayerGVel(a0),d0		; Get current ground speed
 	bpl.s	.CheckSpeed
 	neg.w	d0
@@ -1991,7 +1966,6 @@ ObjSonic_CheckFallOff:
 .CheckSpeed:
 	cmpi.w	#$280,d0			; Is our ground speed less than 2.5?
 	bcc.s	.End				; If not, branch
-
 	clr.w	oPlayerGVel(a0)			; Set ground velocity to 0
 	nop
 	nop
@@ -2014,11 +1988,9 @@ ObjSonic_CheckFallOff:
 ObjSonic_JumpAngle:
 	btst	#1,oPlayerCtrl(a0)		; Are we on a 3D ramp?
 	bne.s	.End				; If so, branch
-
 	move.b	oAngle(a0),d0			; Get current angle
 	beq.s	.End				; If it's 0, branch
 	bpl.s	.DecPosAngle			; If it's positive, branch
-
 	addq.b	#2,d0				; Slowly set angle back to 0
 	bcc.s	.DontCap
 	moveq	#0,d0
@@ -2150,7 +2122,6 @@ Player_LvlColAir_Left:
 	bsr.w	Player_GetLWallDist		; Are we colliding with a wall on the left?
 	tst.w	d1
 	bpl.s	.NotLeftWall			; If not, branch
-
 	sub.w	d1,oX(a0)			; Move outside of the wall
 	move.w	#0,oXVel(a0)			; Stop moving horizontally
 	move.w	oYVel(a0),oPlayerGVel(a0)	; Set landing speed
@@ -2160,7 +2131,6 @@ Player_LvlColAir_Left:
 	bsr.w	Player_CheckCeiling		; Are we colliding with a ceiling?
 	tst.w	d1
 	bpl.s	.NotCeiling			; If not, branch
-
 	sub.w	d1,oY(a0)			; Move outside of the ceiling
 	tst.w	oYVel(a0)			; Were we moving upwards?
 	bpl.s	.End				; If not, branch
@@ -2172,11 +2142,9 @@ Player_LvlColAir_Left:
 .NotCeiling:
 	tst.w	oYVel(a0)			; Are we moving upwards?
 	bmi.s	.End2				; If so, branch
-
 	bsr.w	Player_CheckFloor		; Are we colliding with the floor?
 	tst.w	d1
 	bpl.s	.End2				; If not, branch
-
 	add.w	d1,oY(a0)			; Move outside of the floor
 	move.b	d3,oAngle(a0)			; Set angle
 	bsr.w	Player_ResetOnFloor		; Reset flags
@@ -2198,7 +2166,6 @@ Player_LvlColAir_Up:
 	bsr.w	Player_GetLWallDist		; Are we colliding with a wall on the left?
 	tst.w	d1
 	bpl.s	.NotLeftWall			; If not, branch
-
 	sub.w	d1,oX(a0)			; Move outside of the wall
 	move.w	#0,oXVel(a0)			; Stop moving horizontally
 
@@ -2206,7 +2173,6 @@ Player_LvlColAir_Up:
 	bsr.w	Player_GetRWallDist		; Are we colliding with a wall on the right?
 	tst.w	d1
 	bpl.s	.NotRightWall			; If not, branch
-
 	add.w	d1,oX(a0)			; Move outside of the wall
 	move.w	#0,oXVel(a0)			; Stop moving horizontally
 
@@ -2214,9 +2180,7 @@ Player_LvlColAir_Up:
 	bsr.w	Player_CheckCeiling		; Are we colliding with a ceiling?
 	tst.w	d1
 	bpl.s	.End				; If not, branch
-
 	sub.w	d1,oY(a0)			; Move outside of the ceiling
-
 	move.b	d3,d0				; Did we land on a steep slope?
 	addi.b	#$20,d0
 	andi.b	#$40,d0
@@ -2230,7 +2194,6 @@ Player_LvlColAir_Up:
 	move.b	d3,oAngle(a0)			; Set angle
 	bsr.w	Player_ResetOnSteepSlope	; Reset flags
 	move.w	oYVel(a0),oPlayerGVel(a0)	; Set landing speed
-
 	tst.b	d3				; Is our angle 0-$7F?
 	bpl.s	.End				; If so, branch
 	neg.w	oPlayerGVel(a0)			; If not, negate our landing speed
@@ -2249,7 +2212,6 @@ Player_LvlColAir_Right:
 	bsr.w	Player_GetRWallDist		; Are we colliding with a wall on the right?
 	tst.w	d1
 	bpl.s	.NotRightWall			; If not, branch
-
 	add.w	d1,oX(a0)			; Move outside of the wall
 	move.w	#0,oXVel(a0)			; Stop moving horizontally
 	move.w	oYVel(a0),oPlayerGVel(a0)	; Set landing speed
@@ -2259,7 +2221,6 @@ Player_LvlColAir_Right:
 	bsr.w	Player_CheckCeiling		; Are we colliding with a ceiling?
 	tst.w	d1
 	bpl.s	.NotCeiling			; If not, branch
-
 	sub.w	d1,oY(a0)			; Move outside of the ceiling
 	tst.w	oYVel(a0)			; Were we moving upwards?
 	bpl.s	.End				; If not, branch
@@ -2271,11 +2232,9 @@ Player_LvlColAir_Right:
 .NotCeiling:
 	tst.w	oYVel(a0)			; Are we moving upwards?
 	bmi.s	.End2				; If so, branch
-
 	bsr.w	Player_CheckFloor		; Are we colliding with the floor?
 	tst.w	d1
 	bpl.s	.End2				; If not, branch
-
 	add.w	d1,oY(a0)			; Move outside of the floor
 	move.b	d3,oAngle(a0)			; Set angle
 	bsr.w	Player_ResetOnFloor		; Reset flags
@@ -2397,7 +2356,6 @@ ObjSonic_HurtChkLand:
 
 ObjSonic_Dead:
 	bsr.w	ObjSonic_DeadChkGone		; Check if we have gone offscreen
-
 	jsr	ObjMoveGrv			; Apply velocity
 	bsr.w	ObjSonic_RecordPos		; Save current position into the position buffer
 	bsr.w	ObjSonic_Animate		; Animate sprite
@@ -2456,16 +2414,12 @@ ObjSonic_Restart:
 	beq.w	.End				; If not, branch
 	subq.w	#1,oPlayerReset(a0)		; Decrement the delay timer
 	bne.w	.End				; If it hasn't run out, branch
-
 	move.w	#1,levelRestart			; Set to restart the level
-
 	jsr	StopZ80				; Allow conditional jumps to jump in FM sound effects
 	move.b	#1,Z80RAM+$1C3E
 	jsr	StartZ80
-
 	bsr.w	ResetSavedObjFlags		; Reset saved object flags
 	clr.l	flowerCount			; Reset flower count
-
 	tst.b	checkpoint			; Have we hit a checkpoint?
 	bne.s	.Skip				; If so, branch
 	cmpi.b	#1,timeZone			; Are we in the present?
@@ -2474,14 +2428,12 @@ ObjSonic_Restart:
 
 .Skip:
 	move.w	#SCMD_FADECDA,d0		; Set to fade out music
-
 	tst.b	lives				; Are we out of lives?
 	beq.s	.SendCmd			; If so, branch
 	cmpi.b	#1,timeZone			; Are we in the present?
 	bne.s	.SpawnAtStart			; If not, branch
 	tst.b	checkpoint			; Have we hit a checkpoint?
 	beq.s	.SendCmd			; If not, branch
-
 	move.b	#1,spawnMode			; Spawn at checkpoint
 	bra.s	.SendCmd			; Continue setting the fade out command
 
@@ -2598,7 +2550,7 @@ ObjSonic_SpecialChunks:
 		bne.s	.Roll			; If so, branch
 		move.w	#FM_9C,d0		; Play roll sound
 		jsr	PlayFMSound
-		
+
 .Roll:
 	endif
 	jmp	ObjSonic_StartRoll		; Start rolling
@@ -2608,12 +2560,10 @@ ObjSonic_SpecialChunks:
 .SSZ:
 	tst.w	oYVel(a0)			; Are we moving upwards?
 	bmi.s	.End2				; If so, branch
-
 	move.w	oY(a0),d1			; Get position within chunk
 	andi.w	#$FF,d1
 	move.w	oX(a0),d0
 	andi.w	#$FF,d0
-
 	cmpi.w	#$80,d0				; Are we on the right side of the chunk?
 	bcc.s	.CheckIfAbove			; If so, branch
 	cmpi.w	#$38,d1				; Are we at the top of the chunk?
@@ -2644,29 +2594,24 @@ ObjSonic_SpecialChunks:
 
 ObjSonic_Animate:
 	lea	Ani_Sonic,a1			; Get animation script
-
 	moveq	#0,d0				; Get current animation
 	move.b	oAnim(a0),d0
 	cmp.b	oPrevAnim(a0),d0		; Are we changing animations?
 	beq.s	.Do				; If not, branch
-
 	move.b	d0,oPrevAnim(a0)		; Reset animation flags
 	move.b	#0,oAnimFrame(a0)
 	move.b	#0,oAnimTime(a0)
 
 .Do:
 	bsr.w	ObjSonic_GetMiniAnim		; If we are miniature, get the mini version of the current animation
-
 	add.w	d0,d0				; Get pointer to animation data
 	adda.w	(a1,d0.w),a1
 	move.b	(a1),d0				; Get animation speed/special flag
 	bmi.s	.SpecialAnim			; If it's a special flag, branch
-
 	move.b	oFlags(a0),d1			; Apply horizontal flip flag
 	andi.b	#%00000001,d1
 	andi.b	#%11111100,oSprFlags(a0)
 	or.b	d1,oSprFlags(a0)
-
 	subq.b	#1,oAnimTime(a0)		; Decrement frame duration time
 	bpl.s	.AniDelay			; If it hasn't run out, branch
 	move.b	d0,oAnimTime(a0)		; Reset frame duration time
@@ -2692,7 +2637,6 @@ ObjSonic_Animate:
 .AniFF:
 	addq.b	#1,d0				; Is the flag $FF (loop)?
 	bne.s	.AniFE				; If not, branch
-
 	move.b	#0,oAnimFrame(a0)		; Set animation script frame back to 0
 	move.b	1(a1),d0			; Get animation frame at that point
 	bra.s	.AniNext
@@ -2700,7 +2644,6 @@ ObjSonic_Animate:
 .AniFE:
 	addq.b	#1,d0				; Is the flag $FE (loop back to frame)?
 	bne.s	.AniFD
-
 	move.b	2(a1,d1.w),d0			; Get animation script frame to go back to
 	sub.b	d0,oAnimFrame(a0)
 	sub.b	d0,d1				; Get animation frame at that point
@@ -2714,7 +2657,6 @@ ObjSonic_Animate:
 
 .End:
 	rts
-
 ; -------------------------------------------------------------------------
 
 .SpecialAnim:
@@ -2723,17 +2665,14 @@ ObjSonic_Animate:
 
 	addq.b	#1,d0				; Is this special animation $FF (walking/running)?
 	bne.w	.RollAnim			; If not, branch
-
 	tst.b	miniSonic			; Are we minature?
 	bne.w	.MiniSonicRun			; If so, branch
-
 	moveq	#0,d1				; Initialize flip flags
 	move.b	oAngle(a0),d0			; Get angle
 	move.b	oFlags(a0),d2			; Are we flipped horizontally?
-	andi.b	#%00000001,d2
+	andi.b	#1,d2
 	bne.s	.Flipped			; If so, branch
 	not.b	d0				; If not, flip the angle
-
 .Flipped:
 	btst	#1,oPlayerCtrl(a0)		; Are we on a 3D ramp?
 	bne.s	.3DRamp				; If so, branch
@@ -2745,13 +2684,11 @@ ObjSonic_Animate:
 
 .CheckInvert:
 	bpl.s	.NoInvert			; If we aren't on an angle where we should flip the sprite, branch
-	moveq	#%00000011,d1			; If we are, set the flip flags accordingly
-
+	moveq	#3,d1				; If we are, set the flip flags accordingly
 .NoInvert:
-	andi.b	#%11111100,oSprFlags(a0)	; Apply flip flags
+	andi.b	#$FC,oSprFlags(a0)		; Apply flip flags
 	eor.b	d1,d2
 	or.b	d2,oSprFlags(a0)
-
 	btst	#5,oFlags(a0)			; Are we pushing on something?
 	bne.w	.PushAnim			; If so, branch
 
@@ -2774,7 +2711,6 @@ ObjSonic_Animate:
 	lsr.b	#4,d0				; Get offset of the angled sprites we need for running and peelout
 	andi.b	#6,d0				; ((((angle + 16) / 16) & 6) * 2)
 						; (angle is NOT'd if we are facing right)
-
 	lea	SonAni_Peelout,a1		; Get peelout sprites
 	cmpi.w	#$A00,d2			; Are we running at peelout speed?
 	bcc.s	.GotRunAnim			; If so, branch
@@ -2782,14 +2718,12 @@ ObjSonic_Animate:
 	cmpi.w	#$600,d2			; Are we running at running speed?
 	bcc.s	.GotRunAnim			; If so, branch
 	lea	SonAni_Walk,a1			; Get walking sprites
-
 	move.b	d0,d1				; Get offset of the angled sprites we need for walking
 	lsr.b	#1,d1				; ((((angle + 16) / 16) & 6) * 3)
 	add.b	d1,d0				; (angle is NOT'd if we are facing right)
 
 .GotRunAnim:
 	add.b	d0,d0
-
 	move.b	d0,d3				; Get animation duration
 	neg.w	d2				; max(-ground speed + 8, 0)
 	addi.w	#$800,d2
@@ -2799,7 +2733,6 @@ ObjSonic_Animate:
 .BelowMax:
 	lsr.w	#8,d2
 	move.b	d2,oAnimTime(a0)
-
 	bsr.w	.RunAnimScript			; Run animation script
 	add.b	d3,oMapFrame(a0)		; Add angle offset
 	rts
@@ -2833,24 +2766,19 @@ ObjSonic_Animate:
 	cmpi.w	#$600,d2			; Are we rolling fast?
 	bcc.s	.GotRollAnim			; If so, branch
 	lea	SonAni_Roll,a1			; If not, use the regular rolling sprites
-
 .GotRollAnim:
 	neg.w	d2				; Get animation duration
 	addi.w	#$400,d2			; max(-ground speed + 4, 0)
 	bpl.s	.BelowMax2
 	moveq	#0,d2
-
 .BelowMax2:
 	lsr.w	#8,d2
 	move.b	d2,oAnimTime(a0)
-
 	move.b	oFlags(a0),d1			; Apply horizontal flip flag
 	andi.b	#%00000001,d1
 	andi.b	#%11111100,oSprFlags(a0)
 	or.b	d1,oSprFlags(a0)
-
 	bra.w	.RunAnimScript			; Run animation script
-
 ; -------------------------------------------------------------------------
 
 .CheckPush:
@@ -2870,7 +2798,6 @@ ObjSonic_Animate:
 .BelowMax3:
 	lsr.w	#6,d2
 	move.b	d2,oAnimTime(a0)
-
 	lea	SonAni_PushMini,a1		; Get mini pushing sprites
 	tst.b	miniSonic			; Are we miniature?
 	bne.s	.GotPushAnim			; If so, branch
@@ -2881,7 +2808,6 @@ ObjSonic_Animate:
 	andi.b	#%00000001,d1
 	andi.b	#%11111100,oSprFlags(a0)
 	or.b	d1,oSprFlags(a0)
-
 	bra.w	.RunAnimScript			; Run animation script
 
 ; -------------------------------------------------------------------------
@@ -2911,11 +2837,9 @@ ObjSonic_Animate:
 .NoFlip2:
 	andi.b	#%11111100,oSprFlags(a0)	; Apply horizontal flip flag
 	or.b	d2,oSprFlags(a0)
-
 	addi.b	#$30,d0				; Are we running on the floor?
 	cmpi.b	#$60,d0
 	bcs.s	.MiniOnFloor			; If so, branch
-
 	bset	#2,oFlags(a0)			; Mark as rolling
 	move.b	#$A,oYRadius(a0)		; Set miniature rolling hitbox size
 	move.b	#5,oXRadius(a0)
@@ -2942,7 +2866,6 @@ ObjSonic_Animate:
 .BelowMax4:
 	lsr.w	#8,d2
 	move.b	d2,oAnimTime(a0)
-
 	bra.w	.RunAnimScript			; Run animation script
 
 ; -------------------------------------------------------------------------
@@ -3056,23 +2979,19 @@ Ani_Sonic:
 LoadSonicDynPLC:
 	tst.b	(a0)				; Are we even loaded at all?
 	beq.w	.End				; If not, branch
-
 	lea	sonicLastFrame.w,a2		; Get the ID of the last sprite frame that was loaded
 	moveq	#0,d0
 	move.b	oMapFrame(a0),d0		; Get current sprite frame ID
 	cmp.b	(a2),d0				; Has our sprite frame changed?
 	beq.s	.End				; If not, branch
 	move.b	d0,(a2)				; Update last sprite frame ID
-
 	lea	DPLC_Sonic,a2			; Get DPLC data for our current sprite frame
 	add.w	d0,d0
 	adda.w	(a2,d0.w),a2
-
 	moveq	#0,d1				; Get number of DPLC entries
 	move.w	(a2)+,d1
 	subq.b	#1,d1
 	bmi.s	.End				; If there are none, branch
-
 	lea	sonicArtBuf.w,a3		; Get sprite frame tile buffer
 	move.b	#1,updateSonicArt.w		; Mark buffer as updated
 
@@ -3081,7 +3000,6 @@ LoadSonicDynPLC:
 	move.b	(a2)+,d2
 	move.w	d2,d0
 	lsr.b	#4,d0
-
 	lsl.w	#8,d2				; Get starting tile to load
 	move.b	(a2)+,d2
 	andi.w	#$FFF,d2
@@ -3094,7 +3012,6 @@ LoadSonicDynPLC:
 	movem.l	d2-d6/a4-a6,(a3)
 	lea	$20(a3),a3
 	dbf	d0,.CopyPieceLoop		; Loop until all tiles in this entry are loaded
-
 	dbf	d1,.PieceLoop			; Loop until all entries are processed
 
 .End:
@@ -3116,14 +3033,11 @@ ObjSonic_ChkFlipper:
 	lsl.w	#6,d0
 	addi.l	#objPlayerSlot&$FFFFFF,d0
 	movea.l	d0,a1
-
 	cmpi.b	#$1E,oID(a1)			; Is it a pinball flipper from CCZ?
 	bne.s	.End				; If not, branch
-
 	move.w	#FM_SPRING,d0			; Play spring sound
 	jsr	PlayFMSound
 	move.b	#1,oAnim(a1)			; Set flipper animation to move
-
 	move.w	oX(a1),d1			; Get angle in which to launch at
 	move.w	oY(a1),d2			; arctan((object Y + 24 - player Y) / (object X - player X))
 	addi.w	#24,d2
@@ -3136,10 +3050,8 @@ ObjSonic_ChkFlipper:
 	move.w	oX(a0),d3			; (object width + (player X - object X))
 	sub.w	oX(a1),d3
 	add.w	d2,d3
-
 	btst	#0,oFlags(a1)			; Is the flipper object flipped horizontally?
 	bne.s	.XFlip				; If so, branch
-
 	move.w	#64,d1				; Invert the force to account for the horizontal flip
 	sub.w	d3,d1				; (64 - (object width + (player X - object X)))
 	move.w	d1,d3
@@ -3151,10 +3063,8 @@ ObjSonic_ChkFlipper:
 	muls.w	d3,d1
 	divs.w	#64,d1
 	add.w	d1,d2
-
 	moveq	#0,d1				; Mark as having been on the flipper
 
 .End:
 	rts
-
 ; -------------------------------------------------------------------------

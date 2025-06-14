@@ -4,10 +4,8 @@
 ; -------------------------------------------------------------------------
 ; Eggman statue object
 ; -------------------------------------------------------------------------
-
 oEggStatExplode	EQU	oVar2C
 oEggStatTime	EQU	oVar3F
-
 ; -------------------------------------------------------------------------
 
 ObjEggmanStatue:
@@ -18,24 +16,21 @@ ObjEggmanStatue:
 	move.b	oRoutine(a0),d0
 	move.w	.Index(pc,d0.w),d0
 	jsr	.Index(pc,d0.w)
-	
+
 	jsr	DrawObject
 	cmpi.b	#2,oRoutine(a0)
 	bgt.s	.End
 	jmp	CheckObjDespawn
-	
+
 .End:
 	rts
-
 ; -------------------------------------------------------------------------
-
 .Index:
 	dc.w	ObjEggmanStatue_Init-.Index
 	dc.w	ObjEggmanStatue_Main-.Index
 	dc.w	ObjEggmanStatue_Explode-.Index
 	dc.w	ObjEggmanStatue_Wait-.Index
 	dc.w	ObjEggmanStatue_DropBombs-.Index
-
 ; -------------------------------------------------------------------------
 
 ObjEggmanStatue_Init:
@@ -55,7 +50,6 @@ ObjEggmanStatue_Init:
 	move.l	#MapSpr_EggmanStatue,oMap(a0)
 	move.b	#$F8,oColType(a0)
 	move.l	#ObjEggmanStatue_ExplodeLocs,oEggStatExplode(a0)
-
 ; -------------------------------------------------------------------------
 
 ObjEggmanStatue_Main:
@@ -63,19 +57,18 @@ ObjEggmanStatue_Main:
 	beq.s	.NoExplode
 	clr.w	oColType(a0)
 	addq.b	#2,oRoutine(a0)
-	
+
 	lea	objPlayerSlot.w,a1
 	jsr	SolidObject
 	beq.s	.End
 	jsr	GetOffObject
-	
+
 .End:
 	rts
-	
+
 .NoExplode:
 	lea	objPlayerSlot.w,a1
 	jmp	SolidObject
-
 ; -------------------------------------------------------------------------
 
 ObjEggmanStatue_Explode:
@@ -85,13 +78,13 @@ ObjEggmanStatue_Explode:
 	addq.b	#1,oEggStatTime(a0)
 	cmp.b	oEggStatTime(a0),d0
 	bne.s	.End
-	
+
 	move.b	(a6)+,d5
 	move.b	(a6)+,d6
 	move.l	a6,oEggStatExplode(a0)
 	ext.w	d5
 	ext.w	d6
-	
+
 	jsr	FindObjSlot
 	bne.s	.End
 	move.b	#$18,oID(a1)
@@ -102,26 +95,25 @@ ObjEggmanStatue_Explode:
 	add.w	d6,oY(a1)
 	move.w	#FM_EXPLODE,d0
 	jsr	PlayFMSound
-	
+
 .End:
 	rts
-	
+; -------------------------------------------------------------------------
+
 .Done:
 	addq.b	#2,oRoutine(a0)
 	move.b	#1,oMapFrame(a0)
 	move.b	#60,oEggStatTime(a0)
 	rts
-
 ; -------------------------------------------------------------------------
 
 ObjEggmanStatue_Wait:
 	subq.b	#1,oEggStatTime(a0)
 	bne.s	.End
 	addq.b	#2,oRoutine(a0)
-	
+
 .End:
 	rts
-
 ; -------------------------------------------------------------------------
 
 ObjEggmanStatue_DropBombs:
@@ -130,7 +122,7 @@ ObjEggmanStatue_DropBombs:
 	moveq	#-1,d2
 	move.w	oX(a0),d3
 	move.w	oY(a0),d4
-	
+
 .SpawnBombs:
 	move.b	(a6)+,d5
 	cmpi.b	#-1,d5
@@ -138,7 +130,7 @@ ObjEggmanStatue_DropBombs:
 	move.b	(a6)+,d6
 	ext.w	d5
 	ext.w	d6
-	
+
 	jsr	FindObjSlot
 	bne.s	.Done
 	move.b	d1,oID(a1)
@@ -151,16 +143,14 @@ ObjEggmanStatue_DropBombs:
 	move.w	d4,oSpikeFloorY(a1)
 	addi.w	#38,oSpikeFloorY(a1)
 	bra.s	.SpawnBombs
-	
+
 .Done:
 	jmp	DeleteObject
-
 ; -------------------------------------------------------------------------
 
 MapSpr_EggmanStatue:
 	include	"Level/Wacky Workbench/Objects/Eggman Statue/Data/Mappings (Statue).asm"
 	even
-
 ObjEggmanStatue_ExplodeLocs:
 	dc.b	1, 0, 0
 	dc.b	5, $EE, $F6
@@ -173,7 +163,6 @@ ObjEggmanStatue_ExplodeLocs:
 	dc.b	$28, $F6, $A
 	dc.b	-1
 	even
-
 ObjEggmanStatue_BombLocs:
 	dc.b	$E8, $C0
 	dc.b	$F8, $40
@@ -187,14 +176,11 @@ ObjEggmanStatue_BombLocs:
 	dc.b	$78, $C0
 	dc.b	-1
 	even
-
 ; -------------------------------------------------------------------------
 ; Spike bomb
 ; -------------------------------------------------------------------------
-
 oSpikeYVel	EQU	oVar2A
 oSpikeFloorY	EQU	oVar2E
-
 ; -------------------------------------------------------------------------
 
 ObjSpikeBomb:
@@ -203,14 +189,11 @@ ObjSpikeBomb:
 	move.w	.Index(pc,d0.w),d0
 	jsr	.Index(pc,d0.w)
 	jmp	DrawObject
-
 ; -------------------------------------------------------------------------
-
 .Index:
 	dc.w	ObjSpikeBomb_Init-.Index
 	dc.w	ObjSpikeBomb_Main-.Index
 	dc.w	ObjSpikeBomb_Explode-.Index
-
 ; -------------------------------------------------------------------------
 
 ObjSpikeBomb_Init:
@@ -224,23 +207,21 @@ ObjSpikeBomb_Init:
 	move.l	#MapSpr_SpikeBomb,oMap(a0)
 	move.b	#$B7,oColType(a0)
 	move.l	#0,oSpikeYVel(a0)
-
 ; -------------------------------------------------------------------------
 
 ObjSpikeBomb_Main:
 	move.l	oSpikeYVel(a0),d0
 	add.l	d0,oY(a0)
 	addi.l	#$400,oSpikeYVel(a0)
-	
+
 	move.w	oY(a0),d0
 	cmp.w	oSpikeFloorY(a0),d0
 	blt.s	.Animate
 	addq.b	#2,oRoutine(a0)
-	
+
 .Animate:
 	lea	Ani_SpikeBomb(pc),a1
 	jmp	AnimateObject
-
 ; -------------------------------------------------------------------------
 
 ObjSpikeBomb_Explode:
@@ -249,15 +230,11 @@ ObjSpikeBomb_Explode:
 	move.b	#1,oExplodeBadnik(a0)
 	move.w	#FM_EXPLODE,d0
 	jmp	PlayFMSound
-
 ; -------------------------------------------------------------------------
-
 Ani_SpikeBomb:
 	include	"Level/Wacky Workbench/Objects/Eggman Statue/Data/Animations (Bomb).asm"
 	even
-
 MapSpr_SpikeBomb:
 	include	"Level/Wacky Workbench/Objects/Eggman Statue/Data/Mappings (Bomb).asm"
 	even
-
 ; -------------------------------------------------------------------------
