@@ -141,7 +141,6 @@ ObjMoveGrvUnused:
 	asl.l	#8,d0
 	sub.l	d0,d2
 	move.l	d2,oX(a0)
-
 	move.w	#$38,d0				; Apply gravity without first applying Y velocity
 	ext.l	d0				; ...and getting the Y position first
 	asl.l	#8,d0
@@ -180,20 +179,16 @@ ObjMoveYRevGrv:
 ; -------------------------------------------------------------------------
 
 ObjMoveUnused:
-	rts
 	move.l	oX(a0),d2			; Get position
 	move.l	oY(a0),d3
-
 	move.w	oXVel(a0),d0			; Apply X velocity
 	ext.l	d0
 	asl.l	#8,d0
 	sub.l	d0,d2
-
 	move.w	oYVel(a0),d0			; Apply Y velocity
 	ext.l	d0
 	asl.l	#8,d0
 	sub.l	d0,d3
-
 	move.l	d2,oX(a0)			; Update position
 	move.l	d3,oY(a0)
 	rts
