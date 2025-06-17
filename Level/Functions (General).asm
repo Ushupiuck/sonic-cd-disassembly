@@ -39,12 +39,10 @@ Random:
 
 InitControllers:
 	bsr.w	StopZ80				; Stop the Z80
-
 	moveq	#$40,d0				; Initialize controller ports
 	move.b	d0,IOCTRL1
 	move.b	d0,IOCTRL2
 	move.b	d0,IOCTRL3
-
 	bra.w	StartZ80			; Start the Z80
 
 ; -------------------------------------------------------------------------
@@ -60,7 +58,7 @@ ReadControllers:
 		movea.l	demoDataPtr.w,a2	; Get demo data
 		tst.w	demoMode		; Are we in a demo?
 		beq.s	.NotDemo		; If not, branch
-		
+
 		move.w	demoDataIndex.w,d0	; Get data index
 		cmpi.w	#$800,d0		; Has the demo run out?
 		bcc.s	.NotDemo		; If so, branch
@@ -359,7 +357,6 @@ DrawTilemap:
 .TileLoop:
 	move.w	(a1)+,(a6)			; Copy tile data
 	dbf	d3,.TileLoop			; Loop until row is drawn
-
 	add.l	d4,d0				; Next row
 	dbf	d2,.RowLoop			; Loop until tilemap is drawn
 	rts
@@ -581,7 +578,6 @@ NemBCT_ShortCode_Loop:
 
 LoadPLC:
 	movem.l	a1-a2,-(sp)			; Save registers
-	
 	lea	PLCLists,a1			; Prepare PLC list index
 	add.w	d0,d0				; Get pointer to PLC list
 	move.w	(a1,d0.w),d0
@@ -616,16 +612,12 @@ LoadPLC:
 
 InitPLC:
 	movem.l	a1-a2,-(sp)			; Save registers
-	
 	lea	PLCLists,a1			; Prepare PLC list index
 	add.w	d0,d0				; Get pointer to PLC list
 	move.w	(a1,d0.w),d0
 	lea	(a1,d0.w),a1
-
 	bsr.s	ClearPLCs			; Clear PLCs
-
 	lea	plcBuffer.w,a2			; Prepare PLC buffer
-
 	move.w	(a1)+,d0			; Get number of PLC entries
 	bmi.s	.End				; If it's 0 (or less), branch
 
@@ -660,7 +652,6 @@ ProcessPLCs:
 	beq.s	.End				; If so, branch
 	tst.w	plcTileCount.w			; Is there a decompression in process already?
 	bne.s	.End				; If so, branch
-
 	movea.l	plcBuffer.w,a0			; Get art pointer
 	lea	NemPCD_WriteRowToVDP,a3		; Write to VRAM
 	lea	nemBuffer.w,a1			; Prepare Nemesis buffer
@@ -670,15 +661,11 @@ ProcessPLCs:
 
 .NotXOR:
 	andi.w	#$7FFF,d2			; Store number of tiles to decompress
-	move.w	d2,plcTileCount.w
-
 	bsr.w	NemDec_BuildCodeTable		; Build code table for this art
-
 	move.b	(a0)+,d5			; Get first word of compressed data
 	asl.w	#8,d5
 	move.b	(a0)+,d5
 	moveq	#$10,d6				; Set initial shift value
-
 	moveq	#0,d0				; Prepare decompression registers
 	move.l	a0,plcBuffer.w
 	move.l	a3,plcNemWrite.w
@@ -687,6 +674,7 @@ ProcessPLCs:
 	move.l	d0,plcRow.w
 	move.l	d5,plcRead.w
 	move.l	d6,plcShift.w
+	move.w	d2,plcTileCount.w
 
 .End:
 	rts
@@ -717,7 +705,6 @@ DecompPLCSlow:
 	beq.s	DecompPLC_Done			; If not, branch
 	tst.b	scrollLock.w			; Is scrolling locked?
 	bne.s	DecompPLCFast_Large		; If so, go with the large batch instead
-
 	move.w	#3,plcProcTileCnt.w		; Decompress 3 tiles in this batch
 	moveq	#0,d0				; Get VRAM address
 	move.w	plcBuffer+4.w,d0
@@ -733,7 +720,6 @@ DecompPLC_Main:
 	swap	d0
 	move.l	d0,(a4)
 	subq.w	#4,a4				; Prepare data port
-
 	movea.l	plcBuffer.w,a0			; Get decompression registers
 	movea.l	plcNemWrite.w,a3
 	move.l	plcRepeat.w,d0
@@ -750,7 +736,6 @@ DecompPLC_Main:
 	beq.s	DecompPLC_Pop			; If this art is finished being decompressed, branch
 	subq.w	#1,plcProcTileCnt.w		; Decrement number of tiles left to decompress in this batch
 	bne.s	.Decomp				; If we are not done, branch
-
 	move.l	a0,plcBuffer.w			; Update decompression registers
 	move.l	a3,plcNemWrite.w
 	move.l	d0,plcRepeat.w
@@ -790,12 +775,10 @@ LoadPLCImm:
 	add.w	d0,d0				; Get pointer to PLC list
 	move.w	(a1,d0.w),d0
 	lea	(a1,d0.w),a1
-
 	move.w	(a1)+,d1			; Get number of entries
 
 .Load:
 	movea.l	(a1)+,a0			; Get art pointer
-
 	moveq	#0,d0				; Get VRAM address
 	move.w	(a1)+,d0
 	lsl.l	#2,d0				; Convert VRAM address to VDP write command and set it
@@ -803,9 +786,7 @@ LoadPLCImm:
 	ori.w	#$4000,d0
 	swap	d0
 	move.l	d0,VDPCTRL
-
 	bsr.w	NemDec				; Decompress the art
-
 	dbf	d1,.Load
 	rts
 
